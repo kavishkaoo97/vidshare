@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VidShare - Watch & Discover</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        @media (min-width: 768px) {
+            .header {
+                padding: 1.5rem 2rem;
+            }
+            
+            .header-content {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @media (min-width: 768px) {
+            .logo {
+                font-size: 2rem;
+            }
+        }
+
+        .search-bar {
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                padding: 3rem 2rem;
+            }
+        }
+
+        .section-title {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        @media (min-width: 768px) {
+            .section-title {
+                font-size: 2rem;
+                margin-bottom: 2rem;
+            }
+        }
+
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        @media (min-width: 640px) {
+            .videos-grid {
+                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .videos-grid {
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+                gap: 2rem;
+            }
+        }
+
+        .video-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .video-thumbnail {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        @media (min-width: 768px) {
+            .video-thumbnail {
+                height: 200px;
+            }
+        }
+
+        .video-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .play-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            transition: transform 0.3s;
+        }
+
+        @media (min-width: 768px) {
+            .play-overlay {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+        }
+
+        .video-card:hover .play-overlay {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .duration-badge {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 5px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        @media (min-width: 768px) {
+            .duration-badge {
+                font-size: 0.85rem;
+            }
+        }
+
+        .video-info {
+            padding: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .video-info {
+                padding: 1.5rem;
+            }
+        }
+
+        .video-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #333;
+            line-height: 1.3;
+        }
+
+        @media (min-width: 768px) {
+            .video-title {
+                font-size: 1.25rem;
+            }
+        }
+
+        .video-description {
+            color: #666;
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .video-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #999;
+            gap: 0.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .video-meta {
+                font-size: 0.9rem;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .modal {
+                padding: 2rem;
+            }
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        @media (min-width: 768px) {
+            .modal-content {
+                border-radius: 20px;
+            }
+        }
+
+        .modal-video {
+            width: 100%;
+            border-radius: 15px 15px 0 0;
+            background: #000;
+        }
+
+        @media (min-width: 768px) {
+            .modal-video {
+                border-radius: 20px 20px 0 0;
+            }
+        }
+
+        .modal-info {
+            padding: 1.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .modal-info {
+                padding: 2rem;
+            }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.25rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        @media (min-width: 768px) {
+            .close-btn {
+                top: 2rem;
+                right: 2rem;
+                width: 40px;
+                height: 40px;
+                font-size: 1.5rem;
+            }
+        }
+
+        .close-btn:hover {
+            transform: rotate(90deg);
+        }
+
+        .category-pills {
+            display: none;
+        }
+
+        .category-pill {
+            display: none;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .pagination button {
+            background: white;
+            color: #667eea;
+            border: 2px solid white;
+            padding: 0.75rem 1.25rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 44px;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .pagination button.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 640px) {
+            .pagination button {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+                min-width: 40px;
+            }
+        }
+    </style>
+  </head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">🎬 VidShare</div>
+            <div class="search-bar">
+                <input type="text" placeholder="Search videos..." id="searchInput" onkeyup="searchVideos()">
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2 class="section-title">Trending Now</h2>
+        <div class="videos-grid" id="videosContainer"></div>
+        <div class="pagination" id="pagination"></div>
+    </div>
+
+    <div class="modal" id="videoModal">
+        <button class="close-btn" onclick="closeModal()">✕</button>
+        <div class="modal-content">
+            <video id="modalVideo" class="modal-video" controls></video>
+            <div class="modal-info">
+                <h2 id="modalTitle" style="margin-bottom: 1rem;"></h2>
+                <p id="modalDescription" style="color: #666; line-height: 1.6; margin-bottom: 1rem;"></p>
+                <div id="modalMeta" style="color: #999;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const videos = [
+          {
+    id: 108,
+    title: "SriLanka Model Leak - Kevin AJ Fking Hard",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/74u3oa0iip7i",
+    thumbnail: "https://img.lulucdn.com/74u3oa0iip7i_t.jpg",
+    duration: "01:31",
+    views: 1380,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 107,
+    title: "Indian Beautiful GF Full Fk",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/n8am7y7h2d7m",
+    thumbnail: "https://img.lulucdn.com/n8am7y7h2d7m_t.jpg",
+    duration: "11:33",
+    views: 1250,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 106,
+    title: "SL Babe Playing With Beer",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/xx8aq8tpp4xm",
+    thumbnail: "https://img.lulucdn.com/xx8aq8tpp4xm_t.jpg",
+    duration: "11:55",
+    views: 1280,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 105,
+    title: "Cute Lanka GirlFriend Riding - New Fk",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/93pvfxsptlyq",
+    thumbnail: "https://img.lulucdn.com/93pvfxsptlyq_t.jpg",
+    duration: "01:13",
+    views: 1150,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 104,
+    title: "Colombo Posh Girl Leak - Ishu Sucking And Doggy",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/9xgzhejhevz0",
+    thumbnail: "https://img.lulucdn.com/9xgzhejhevz0_t.jpg",
+    duration: "04:41",
+    views: 1320,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 103,
+    title: "GF Sucking Outdoor In Jungle Beach",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/61hbtgmn9j6n",
+    thumbnail: "https://img.lulucdn.com/61hbtgmn9j6n_t.jpg",
+    duration: "01:26",
+    views: 1180,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 102,
+    title: "New Wife Sharing threesome",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/9cxrlki33wym",
+    thumbnail: "https://img.lulucdn.com/9cxrlki33wym_t.jpg",
+    duration: "02:29",
+    views: 1420,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 101,
+    title: "SriLankan Girl Fk With BF At Hotel Room",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/v7puxwox8t2m",
+    thumbnail: "https://img.lulucdn.com/v7puxwox8t2m_t.jpg",
+    duration: "02:24",
+    views: 1280,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 100,
+    title: "SriLanka Strawberry Nangi Leak Video",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/lzxc6wui35du",
+    thumbnail: "https://img.lulucdn.com/lzxc6wui35du_t.jpg",
+    duration: "07:51",
+    views: 1350,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 99,
+    title: "SL Blue girl leak",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/pkmfwzgjftxb",
+    thumbnail: "https://img.lulucdn.com/pkmfwzgjftxb_t.jpg",
+    duration: "02:45",
+    views: 1220,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 98,
+    title: "New Sinhala Leak - Lanka Couple",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/3e8ly7gk78yp",
+    thumbnail: "https://img.lulucdn.com/3e8ly7gk78yp_t.jpg",
+    duration: "05:08",
+    views: 1150,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 97,
+    title: "Couple Leak Girl Doggystyle",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/uyyag4drwhr3",
+    thumbnail: "https://img.lulucdn.com/uyyag4drwhr3_t.jpg",
+    duration: "05:13",
+    views: 1280,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 96,
+    title: "Girl Leak - Mmsbee New XXX",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/8q9tuxhl3mrg",
+    thumbnail: "https://img.lulucdn.com/8q9tuxhl3mrg_t.jpg",
+    duration: "02:19",
+    views: 1020,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {   
+    id: 95,
+    title: "Sri Lanka Girl Fk - New Couple",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/3pdjz65ktiwl",
+    thumbnail: "https://img.lulucdn.com/3pdjz65ktiwl_t.jpg",
+    duration: "01:19",
+    views: 1100,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 94,
+    title: "Cute Lanka Girl Riding - Nangi Baba Leak New",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/e5subrbf5n5d",
+    thumbnail: "https://img.lulucdn.com/e5subrbf5n5d_t.jpg",
+    duration: "01:00",
+    views: 1240,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 93,
+    title: "Sudu Nangi Leak - Sinhala New Couple Fk",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/jmyi8pjhx44j",
+    thumbnail: "https://img.lulucdn.com/jmyi8pjhx44j_t.jpg",
+    duration: "01:23",
+    views: 1190,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 92,
+    title: "Chethana Nangi Fk New Sex Sinhala",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/vpzutwk19ih3",
+    thumbnail: "https://img.lulucdn.com/vpzutwk19ih3_t.jpg",
+    duration: "01:22",
+    views: 1080,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 91,
+    title: "Sinhala XXX New Leak - SL Couple Sex",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/xnx4lrafmjqq",
+    thumbnail: "https://img.lulucdn.com/xnx4lrafmjqq_t.jpg",
+    duration: "01:31",
+    views: 1150,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 90,
+    title: "Hot SL Cam Girl - එයාගෙනම් සැප කදක් කලිසමේම යවනව",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/h4z725yju3ic",
+    thumbnail: "https://img.lulucdn.com/h4z725yju3ic_t.jpg",
+    duration: "05:56",
+    views: 1420,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 89,
+    title: "SL New Leak Couple Full F k In Colombo Hotel",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/xkluksme8de7",
+    thumbnail: "https://img.lulucdn.com/xkluksme8de7_t.jpg",
+    duration: "03:58",
+    views: 1320,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 88,
+    title: "SriLanka Cute Girl Leak New Sinhala",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/p2dvvwmilfx7",
+    thumbnail: "https://img.lulucdn.com/p2dvvwmilfx7_t.jpg",
+    duration: "03:11",
+    views: 1250,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 87,
+    title: "New Lovers Leak Girlfriend",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/rkrqamrpsn51",
+    thumbnail: "https://img.lulucdn.com/rkrqamrpsn51_t.jpg",
+    duration: "04:17",
+    views: 1180,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 86,
+    title: "SL Teacher Threesome මිස් කොල්ලො එක්ක ගත්ත තුන්කොන් සැප",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/i5gpam2kmbz1",
+    thumbnail: "https://img.lulucdn.com/i5gpam2kmbz1_t.jpg",
+    duration: "20:30",
+    views: 1550,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 85,
+    title: "Maheshi Nangi New Couple Leak",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/yowcmy7ep1h6",
+    thumbnail: "https://img.lulucdn.com/yowcmy7ep1h6_t.jpg",
+    duration: "06:38",
+    views: 1350,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 84,
+    title: "SL New Model X (1)",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/iigd4it7wo1t",
+    thumbnail: "https://img.lulucdn.com/iigd4it7wo1t_t.jpg",
+    duration: "03:11",
+    views: 1120,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 83,
+    title: "SL Shashini Nangi Leak - Girlfriend F k",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/pkzoxfnj2qo2",
+    thumbnail: "https://img.lulucdn.com/pkzoxfnj2qo2_t.jpg",
+    duration: "03:23",
+    views: 1290,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 82,
+    title: "New Lanka Leak Couple",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/6gcwk5y1dine",
+    thumbnail: "https://img.lulucdn.com/6gcwk5y1dine_t.jpg",
+    duration: "01:14",
+    views: 1050,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 81,
+    title: "SL Bike Girl Sex -Full Fucking 001",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/msyn5wcukek0",
+    thumbnail: "https://img.lulucdn.com/msyn5wcukek0_t.jpg",
+    duration: "05:51",
+    views: 1380,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 80,
+    title: "Sri lankan Lesbian Couple Having Scissor Party",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/59dxnzgqbghq",
+    thumbnail: "https://img.lulucdn.com/59dxnzgqbghq_t.jpg",
+    duration: "03:40",
+    views: 1100,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 79,
+    title: "TikTok Girl New - Sinhala Sudu Nangii",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/6u2f1tkuyrlq",
+    thumbnail: "https://img.lulucdn.com/6u2f1tkuyrlq_t.jpg",
+    duration: "06:20",
+    views: 1420,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 78,
+    title: "Sri Lankan Rich Couple Sex Leak Hotel Part 2",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/hleysay9s7gf",
+    thumbnail: "https://img.lulucdn.com/hleysay9s7gf_t.jpg",
+    duration: "02:12",
+    views: 1150,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 77,
+    title: "Sri Lankan Rich Couple Sex Leak Hotel",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/z68y60k4p7h8",
+    thumbnail: "https://img.lulucdn.com/z68y60k4p7h8_t.jpg",
+    duration: "02:12",
+    views: 1180,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 76,
+    title: "Sri Lankan Cute Nangi Blowjob Hardcore",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/yskjp73itpwc",
+    thumbnail: "https://img.lulucdn.com/yskjp73itpwc_t.jpg",
+    duration: "05:58",
+    views: 1220,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 75,
+    title: "Sri Lankan Home Made Romantic",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/exgblg0uie8i",
+    thumbnail: "https://img.lulucdn.com/exgblg0uie8i_t.jpg",
+    duration: "01:00",
+    views: 970,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 74,
+    title: "Heta Puluwan - Sri Lankan baduwa",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/tgdozabn5xej",
+    thumbnail: "https://img.lulucdn.com/tgdozabn5xej_t.jpg",
+    duration: "01:35",
+    views: 890,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 73,
+    title: "Akkai Aiyai Polleli Gahanawa",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/t7rfwzdoacyy",
+    thumbnail: "https://img.lulucdn.com/t7rfwzdoacyy_t.jpg",
+    duration: "03:12",
+    views: 1300,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 72,
+    title: "Oyage size ekata matanam amaruwei",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/zmtdp6s2dh5h",
+    thumbnail: "https://i.imgur.com/eM5dF2L.jpeg",
+    duration: "01:24",
+    views: 950,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 71,
+    title: "Sri Lankan Teen Sucking Dick - aiyage ekawath ochchara loku na malli",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/3ddl4qimptsh",
+    thumbnail: "https://img.lulucdn.com/3ddl4qimptsh_t.jpg",
+    duration: "05:32",
+    views: 1250,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 70,
+    title: "Kopuwa Dalama Arinawa - Sri lankan Riding",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/vvj1f0r5un13",
+    thumbnail: "https://img.lulucdn.com/vvj1f0r5un13_t.jpg",
+    duration: "01:31",
+    views: 1090,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+
+    id: 69,
+
+    title: "Lankan Doggy Fuckers - Pitipassen Hodata Gahanawa",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/3y5jnwhrwwcf",
+    thumbnail: "https://img.lulucdn.com/3y5jnwhrwwcf_t.jpg",
+    duration: "01:03",
+    views: 1120,
+    uploadDate: "Today",
+    category: "entertainment"
+
+},
+          {
+    id: 68,
+    title: "Chubby Girlfriend",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/k6afe4l8gb2n",
+    thumbnail: "https://img.lulucdn.com/k6afe4l8gb2n_t.jpg",
+    duration: "02:27",
+    views: 980,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 67,
+    title: "Kukkuwata Badu Danawa - Cumshot To boobs Sri lanka",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/cry90nad0w8x",
+    thumbnail: "https://img.lulucdn.com/cry90nad0w8x_t.jpg",
+    duration: "02:09",
+    views: 1050,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 66,
+    title: "Sri Lankan Shaved Pussy Teen Slut",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/d6ish47mgsre",
+    thumbnail: "https://img.lulucdn.com/d6ish47mgsre_t.jpg",
+    duration: "01:24",
+    views: 1180,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+
+    id: 65,
+    title: "Romantic Hard core Sri Lanka",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/7wjvjh6y6dqt",
+    thumbnail: "https://img.lulucdn.com/7wjvjh6y6dqt_t.jpg",
+    duration: "01:16",
+    views: 1020,
+    uploadDate: "Today",
+    category: "entertainment"
+
+},
+          {
+    id: 64,
+    title: "Supiri Kallakata Sapak Denawa - Sri Lankan Romantic Couple part 2",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/zxxucs49ajid",
+    thumbnail: "https://img.lulucdn.com/zxxucs49ajid_t.jpg",
+    duration: "01:00",
+    views: 900,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 63,
+    title: "Supiri Kallakata Sapak Denawa - Sri Lankan Romantic Couple part 1",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/6nx8vugqp404",
+    thumbnail: "https://img.lulucdn.com/6nx8vugqp404_t.jpg",
+    duration: "01:00",
+    views: 920,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 62,
+    title: "Sri Lankan Tiktok Girl Leak",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/3v800jcas4lg",
+    thumbnail: "https://img.lulucdn.com/3v800jcas4lg_t.jpg",
+    duration: "01:20",
+    views: 1350,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+
+    id: 61,
+    title: "Miniha thane mirikaddi yaluwa ganita gahanawa",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/6nb7gm8fb1r5",
+    thumbnail: "https://img.lulucdn.com/6nb7gm8fb1r5_t.jpg",
+    duration: "02:45",
+    views: 1080,
+    uploadDate: "Today",
+    category: "entertainment"
+
+},
+          {
+
+    id: 60,
+    title: "Sri Lankan Hot aunty sucking - Kukkuwe payya waddala uranawa",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/nteb6va2u3xc",
+    thumbnail: "https://img.lulucdn.com/nteb6va2u3xc_t.jpg",
+    duration: "04:06",
+    views: 1240,
+    uploadDate: "Today",
+    category: "entertainment"
+
+},
+          {
+
+    id: 59,
+    title: "Romantic couple having fun",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/4cbzlgldhgvr",
+    thumbnail: "https://i.imgur.com/oo7duOE.jpeg",
+    duration: "02:03",
+    views: 950,
+    uploadDate: "Today",
+    category: "entertainment"
+
+},
+          {
+
+    id: 58,
+    title: "Ayyo Oyagen Puduma wadayak thiyenne",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/l4m169jw53f0",
+    thumbnail: "https://img.lulucdn.com/l4m169jw53f0_t.jpg",
+    duration: "02:14",
+    views: 870,
+    uploadDate: "Today",
+    category: "entertainment"
+
+},
+          {
+
+    id: 57,
+    title: "Sri Lankan Old leak",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/9rkspv3qc4gr",
+    thumbnail: "https://img.lulucdn.com/9rkspv3qc4gr_t.jpg",
+    duration: "13:38",
+    views: 1150,
+    uploadDate: "Today",
+    category: "entertainment"
+
+},
+          {
+
+    id: 56,
+    title: "Palal Karalama denawa - Sri Lankan Sex Video",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/tosq65i25vnq",
+    thumbnail: "https://img.lulucdn.com/tosq65i25vnq_t.jpg",
+    duration: "03:18",
+    views: 990,
+    uploadDate: "Today",
+    category: "entertainment"
+
+},
+          {
+    id: 55,
+    title: "Aunty Riding Lankan Cock",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/e6eayxzjt25f",
+    thumbnail: "https://img.lulucdn.com/e6eayxzjt25f_t.jpg",
+    duration: "02:27",
+    views: 1180,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 52,
+    title: "Sri Lankan BDSM fuck - wada deela Gahanawa",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/fbmx43wwv4x0",
+    thumbnail: "https://img.lulucdn.com/fbmx43wwv4x0_t.jpg",
+    duration: "01:45",
+    views: 1100,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+
+    id: 54,
+
+    title: "Hirata Puke Arinawa - Anal Sex Sri Lanka",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/mwj6ugppxp0n",
+    thumbnail: "https://img.lulucdn.com/mwj6ugppxp0n_t.jpg",
+    duration: "02:04",
+    views: 1050,
+    uploadDate: "Today",
+    category: "entertainment"
+
+},
+          {
+    id: 53,
+    title: "Oka Karannada Ona iiya - Sinhala Honey Teen voice",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/3amnhp3u0lhm",
+    thumbnail: "https://img.lulucdn.com/3amnhp3u0lhm_t.jpg",
+    duration: "01:59",
+    views: 920,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 51,
+    title: "Sri Lankan threesome hil dekatama bassanawa",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/ji99p45h49yz",
+    thumbnail: "https://img.lulucdn.com/ji99p45h49yz_t.jpg",
+    duration: "01:51",
+    views: 1320,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 50,
+    title: "Sri Lankan Chubby Couple Fucking - Sri Lankan Sex video",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/o6ck8e4ej02a",
+    thumbnail: "https://img.lulucdn.com/o6ck8e4ej02a_t.jpg",
+    duration: "02:31",
+    views: 1050,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+
+    id: 49,
+
+    title: "Sudu Aunty Polleli Gahanawa - Beautiful Sri Lankan aunty riding",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/uqd4k3k7tm4m",
+    thumbnail: "https://img.lulucdn.com/uqd4k3k7tm4m_t.jpg",
+    duration: "02:50",
+    views: 1180,
+    uploadDate: "Today",
+    category: "entertainment"
+
+},
+          {
+    id: 48,
+    title: "Pirith dagena katata gannawa",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/nhy47l07bkvr",
+    thumbnail: "https://img.lulucdn.com/nhy47l07bkvr_t.jpg",
+    duration: "02:15",
+    views: 820,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 47,
+    title: "Juice Galaddi Puke Arinawa Sri Lankan Anal",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/9191wjc9uy85",
+    thumbnail: "https://img.lulucdn.com/9191wjc9uy85_t.jpg",
+    duration: "01:00",
+    views: 880,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 46,
+    title: "Garment Badu Deka Appa Danawa - Lesbian Sinhala Sex Video",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/dguj9fu8nih9",
+    thumbnail: "https://img.lulucdn.com/dguj9fu8nih9_t.jpg",
+    duration: "03:15",
+    views: 940,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 45,
+    title: "Sri Lankan Threesome Sex 02",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/gsvvbekgtufs",
+    thumbnail: "https://img.lulucdn.com/gsvvbekgtufs_t.jpg",
+    duration: "02:05",
+    views: 1250,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 44,
+    title: "Sri Lankan Tight Figure Teen",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/ro2nvzdzuxb7",
+    thumbnail: "https://img.lulucdn.com/ro2nvzdzuxb7_t.jpg",
+    duration: "03:54",
+    views: 1120,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+
+    id: 43,
+
+    title: "Oka Hodata Urapan Kelle",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/ohxdebfdv5xx",
+    thumbnail: "https://img.lulucdn.com/ohxdebfdv5xx_t.jpg",
+    duration: "02:46",
+    views: 850,
+    uploadDate: "Today",
+    category: "entertainment"
+
+},
+          {
+    id: 42,
+    title: "Chubby Girl Enjoying Her Amazing Fucks",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/etzjq5qu3u9o",
+    thumbnail: "https://img.lulucdn.com/etzjq5qu3u9o_t.jpg",
+    duration: "02:01",
+    views: 980,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 41,
+    title: "Minihata Kiyala Hodata Gassagannawa - Women Fucks by her husband - Sri Lankan Sex Videos & Wal Katha",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/qwnn1qr8z4t3",
+    thumbnail: "https://img.lulucdn.com/qwnn1qr8z4t3_t.jpg",
+    duration: "01:34",
+    views: 900,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 40,
+    title: "Katata Aragena theth karala obagannawa",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/f2nyn9kfhkln",
+    thumbnail: "https://img.lulucdn.com/f2nyn9kfhkln_t.jpg",
+    duration: "02:13",
+    views: 760,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 39,
+    title: "Sinhala Milf With Voice - Nandata Gahanawa",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/wnip46q94swd",
+    thumbnail: "https://img.lulucdn.com/wnip46q94swd_t.jpg",
+    duration: "01:00",
+    views: 820,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 38,
+    title: "Onlyfans Oasi Das fucks her client Indian Milf",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/x6lcozgkrpdo",
+    thumbnail: "https://img.lulucdn.com/x6lcozgkrpdo_t.jpg",
+    duration: "09:03",
+    views: 1150,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 37,
+    title: "Nice figure girl fucking with sinhala voice",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/l9wa6e4tc45u",
+    thumbnail: "https://i.postimg.cc/0Qh0x2Hz/photo-2025-12-29-00-12-30.jpg",
+    duration: "12:19",
+    views: 1280,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+
+    id: 36,
+
+    title: "A girl and boy viral leak video",
+
+    description: "New video upload",
+
+    videoUrl: "https://luluvid.com/h5yl345i2jwh",
+
+    thumbnail: "https://img.lulucdn.com/h5yl345i2jwh_t.jpg",
+
+    duration: "19:34",
+
+    views: 1420,
+
+    uploadDate: "Today",
+
+    category: "entertainment"
+
+},
+          {
+    id: 35,
+    title: "Sri Lanka Dark-Hued Dark-Hued Tramp Wifey",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/oz6wx0g9v8be",
+    thumbnail: "https://img.lulucdn.com/oz6wx0g9v8be_t.jpg",
+    duration: "17:59",
+    views: 1180,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 34,
+    title: "Pussy Licking Asian Guy",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/xep472by42qo",
+    thumbnail: "https://img.lulucdn.com/xep472by42qo_t.jpg",
+    duration: "07:20",
+    views: 980,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 33,
+    title: "Sri Lanka Monster Cock Wife Cheating Husbands Friends",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/j8vwagtz507j",
+    thumbnail: "https://img.lulucdn.com/j8vwagtz507j_t.jpg",
+    duration: "07:10",
+    views: 1350,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 32,
+    title: "Sri lankan bitch get painful fuck",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/5ennvsbxxyk9",
+    thumbnail: "https://img.lulucdn.com/5ennvsbxxyk9_t.jpg",
+    duration: "01:42",
+    views: 890,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 31,
+    title: "SL three some Fuck Leak",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/m9oz5p018yzw",
+    thumbnail: "https://img.lulucdn.com/m9oz5p018yzw_t.jpg",
+    duration: "01:00",
+    views: 1020,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 30,
+    title: "Sri Lankan Best Homemade",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/34xnv1w9u1s3",
+    thumbnail: "https://img.lulucdn.com/34xnv1w9u1s3_t.jpg",
+    duration: "05:00",
+    views: 1100,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 29,
+    title: "srilankan girl blowjob and fuck",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/v4ym40288dpk",
+    thumbnail: "https://img.lulucdn.com/v4ym40288dpk_t.jpg",
+    duration: "02:20",
+    views: 940,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 28,
+    title: "Sri Lnakan milf gets fuck in the ass",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/ofxx442hm52j",
+    thumbnail: "https://img.lulucdn.com/ofxx442hm52j_t.jpg",
+    duration: "08:22",
+    views: 1220,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 27,
+    title: "sri lankan girl showing boobs",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/9d3oex7cpbp9",
+    thumbnail: "https://img.lulucdn.com/9d3oex7cpbp9_t.jpg",
+    duration: "01:04",
+    views: 780,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 26,
+    title: "Sri lankan Cuckold wife swap UK UNSEEEN",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/wma5c8jnh22o",
+    thumbnail: "https://img.lulucdn.com/wma5c8jnh22o_t.jpg",
+    duration: "02:55",
+    views: 1080,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 25,
+    title: "SRI LANKAN ANAL FUCK-01",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/smqq4aubyl13",
+    thumbnail: "https://img.lulucdn.com/smqq4aubyl13_t.jpg",
+    duration: "03:13",
+    views: 1150,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 24,
+    title: "Bahala Thibba Eka Nagganawa - Sri Lankan Blowjob",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/7ltvt6jny7rf",
+    thumbnail: "https://img.lulucdn.com/7ltvt6jny7rf_t.jpg",
+    duration: "01:29",
+    views: 840,
+    uploadDate: "Today",
+    category: "entertainment"
+},{
+    id: 23,
+    title: "Desi Sri lanka wife hard fuck by her boyfriend",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/mb8c9chs1wd9",
+    thumbnail: "https://img.lulucdn.com/mb8c9chs1wd9_t.jpg",
+    duration: "02:30",
+    views: 960,
+    uploadDate: "Today",
+    category: "entertainment"
+},{
+    id: 22,
+    title: "Kukku Beela Katata Denawa - Sri lankan Boobs Sucking",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/2tz7rsnzb7wf",
+    thumbnail: "https://img.lulucdn.com/2tz7rsnzb7wf_t.jpg",
+    duration: "01:16",
+    views: 880,
+    uploadDate: "Today",
+    category: "entertainment"
+},{
+    id: 21,
+    title: "Sri Lnakan milf gets fuck in the ass",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/v8f9tomewhk7",
+    thumbnail: "https://img.lulucdn.com/v8f9tomewhk7_t.jpg",
+    duration: "08:22",
+    views: 1200,
+    uploadDate: "Today",
+    category: "entertainment"
+},{
+    id: 20,
+    title: "fucking my aunt during a trip",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/hz8hzhylx7xu",
+    thumbnail: "https://img.lulucdn.com/hz8hzhylx7xu_t.jpg",
+    duration: "06:26",
+    views: 1050,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+          {
+    id: 19,
+    title: "Allapu Gedara Akka Harima Asai Athule Yawaganna",
+    description: "New video upload",
+    videoUrl: "https://luluvid.com/tmog10kdsdiv",
+    thumbnail: "https://img.lulucdn.com/tmog10kdsdiv_t.jpg",
+    duration: "02:45",
+    views: 920,
+    uploadDate: "Today",
+    category: "entertainment"
+},
+            {
+                id: 18,
+                title: "Sri Lankan Young Girl Leaked In Hostal Part 2",
+                description: "New video upload",
+                videoUrl: "https://luluvid.com/6u3b4spu9gre",
+                thumbnail: "https://img.lulucdn.com/6u3b4spu9gre_t.jpg",
+                duration: "01:20",
+                views: 820,
+                uploadDate: "Today",
+                category: "entertainment"
+            },
+            {
+                id: 17,
+                title: "Sri Lankan Young Girl Leaked In Hostal",
+                description: "New video upload",
+                videoUrl: "https://luluvid.com/pnnequ6wrpwn",
+                thumbnail: "https://img.lulucdn.com/pnnequ6wrpwn_t.jpg",
+                duration: "01:53",
+                views: 870,
+                uploadDate: "Today",
+                category: "entertainment"
+            },
+            {
+                id: 16,
+                title: "Sri Lankan Threesome Record By His Friend - Sri Lankan Threesome Leak",
+                description: "New video upload",
+                videoUrl: "https://luluvid.com/qaatt5ah1xe0",
+                thumbnail: "https://img.lulucdn.com/qaatt5ah1xe0_t.jpg",
+                duration: "01:12",
+                views: 1100,
+                uploadDate: "Today",
+                category: "entertainment"
+            },
+            {
+                id: 15,
+                title: "Sri Lankan Horney Young Wife Getting Orgasm Doggy Fuck - Sinhala Sex Video",
+                description: "New video upload",
+                videoUrl: "https://luluvid.com/iogbg4jzno50",
+                thumbnail: "https://img.lulucdn.com/iogbg4jzno50_t.jpg",
+                duration: "01:36",
+                views: 950,
+                uploadDate: "Today",
+                category: "entertainment"
+            },
+            {
+                id: 14,
+                title: "Old Couple Cuckold Hard - Sri Lankan Leak",
+                description: "New video upload",
+                videoUrl: "https://luluvid.com/zhcaewql4w6m",
+                thumbnail: "https://img.lulucdn.com/zhcaewql4w6m_t.jpg",
+                duration: "02:26",
+                views: 620,
+                uploadDate: "Today",
+                category: "entertainment"
+            },
+            {
+                id: 13,
+                title: "Boy Makes Horny Girl Feel Good - Sinhala Voice Sex Video",
+                description: "New video upload",
+                videoUrl: "https://luluvid.com/zzlia7v0wnvd",
+                thumbnail: "https://img.lulucdn.com/zzlia7v0wnvd_t.jpg",
+                duration: "02:28",
+                views: 780,
+                uploadDate: "Today",
+                category: "entertainment"
+            },
+            {
+                id: 12,
+                title: "Amatuer Sri Lankan Girl Fucked Huge Dick - Sri Lankan Teen Leaks",
+                description: "New video upload",
+                videoUrl: "https://luluvid.com/jav6o4jm81dj",
+                thumbnail: "https://img.lulucdn.com/jav6o4jm81dj_t.jpg",
+                duration: "01:56",
+                views: 890,
+                uploadDate: "Today",
+                category: "entertainment"
+            },
+            {
+                id: 11,
+                title: "Sri Lankan Devala Leak - Part 2",
+                description: "New video upload",
+                videoUrl: "https://luluvid.com/zlm4xa68sxhx",
+                thumbnail: "https://img.lulucdn.com/zlm4xa68sxhx_t.jpg",
+                duration: "05:20",
+                views: 680,
+                uploadDate: "Today",
+                category: "entertainment"
+            },
+            {
+                id: 10,
+                title: "Sri Lankan Devala Leak - Sinhala Hidden Camera",
+                description: "New video upload",
+                videoUrl: "https://luluvid.com/6dey8wb9v109",
+                thumbnail: "https://img.lulucdn.com/6dey8wb9v109_t.jpg",
+                duration: "03:00",
+                views: 720,
+                uploadDate: "Today",
+                category: "entertainment"
+            },
+            {
+                id: 9,
+                title: "Wife Pushing Huge Cock By Husband - Sinhala Sex Video",
+                description: "New video upload",
+                videoUrl: "https://luluvid.com/7bxs5n9j11gi",
+                thumbnail: "https://img.lulucdn.com/7bxs5n9j11gi_t.jpg",
+                duration: "01:14",
+                views: 650,
+                uploadDate: "Today",
+                category: "entertainment"
+            },
+            {
+                id: 8,
+                title: "Husband And Wife Slow Sex After Babies Slept - Sri Lankan Sex Videos - Sri Lankan Sex Videos & Wal Katha",
+                description: "New video upload",
+                videoUrl: "https://luluvid.com/hlu2wawjinm5",
+                thumbnail: "https://img.lulucdn.com/hlu2wawjinm5_t.jpg",
+                duration: "03:30",
+                views: 850,
+                uploadDate: "Today",
+                category: "entertainment"
+            },
+            {
+                id: 7,
+                title: "Licking Aunts Pussy Room Fun - Sri Lankan Aunty Leaks - Sri Lankan Sex Videos & Wal Katha",
+                description: "New video upload",
+                videoUrl: "https://luluvid.com/olpl8a25obxx",
+                thumbnail: "https://img.lulucdn.com/olpl8a25obxx_t.jpg",
+                duration: "07:06",
+                views: 1250,
+                uploadDate: "Today",
+                category: "entertainment"
+            }
+        ];
+
+        let filteredVideos = [...videos];
+        let currentPage = 1;
+        const videosPerPage = 6;
+
+        function renderVideos() {
+            const startIndex = (currentPage - 1) * videosPerPage;
+            const endIndex = startIndex + videosPerPage;
+            const videosToShow = filteredVideos.slice(startIndex, endIndex);
+            
+            const container = document.getElementById('videosContainer');
+            container.innerHTML = videosToShow.map(video => `
+                <div class="video-card" onclick="openModal(${video.id})">
+                    <div class="video-thumbnail">
+                        <img src="${video.thumbnail}" alt="${video.title}">
+                        <div class="play-overlay">▶</div>
+                        <div class="duration-badge">${video.duration}</div>
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">${video.title}</div>
+                        <div class="video-description">${video.description}</div>
+                        <div class="video-meta">
+                            <span>👁 ${video.views.toLocaleString()} views</span>
+                            <span>${video.uploadDate}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            renderPagination();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredVideos.length / videosPerPage);
+            const pagination = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+            
+            let paginationHTML = '';
+            
+            // Previous button
+            paginationHTML += `<button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>← Previous</button>`;
+            
+            // Page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                    paginationHTML += `<button onclick="changePage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`;
+                } else if (i === currentPage - 2 || i === currentPage + 2) {
+                    paginationHTML += `<span style="color: white; padding: 0 0.5rem;">...</span>`;
+                }
+            }
+            
+            // Next button
+            paginationHTML += `<button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next →</button>`;
+            
+            pagination.innerHTML = paginationHTML;
+        }
+
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredVideos.length / videosPerPage);
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderVideos();
+        }
+
+        const videoClickCounts = {};
+
+        function openModal(id) {
+            // Initialize click count for this video if not exists
+            if (!videoClickCounts[id]) {
+                videoClickCounts[id] = 0;
+            }
+            
+            videoClickCounts[id]++;
+            
+            // First two clicks: redirect to the ad website
+            if (videoClickCounts[id] <= 2) {
+                window.open('https://otieu.com/4/10373284', '_blank');
+                return;
+            }
+            
+            // Third click: open the actual video page
+            const video = videos.find(v => v.id === id);
+            window.open(video.videoUrl, '_blank');
+        }
+
+        function closeModal() {
+            document.getElementById('videoModal').classList.remove('active');
+            document.getElementById('modalVideo').pause();
+        }
+
+        function searchVideos() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            if (query === '') {
+                filteredVideos = [...videos];
+            } else {
+                filteredVideos = videos.filter(v => 
+                    v.title.toLowerCase().includes(query) || 
+                    v.description.toLowerCase().includes(query)
+                );
+            }
+            renderVideos();
+        }
+
+        renderVideos();
+
+   </script>
+</body>
+</html>
